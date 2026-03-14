@@ -13,7 +13,12 @@ import java.util.List;
  */
 public class ContactsManager {
 
-    private List<Contacts> LContacts = new ArrayList();
+    private List<Contacts> LContacts;
+
+    public ContactsManager() {
+        // On charge la liste de contacts au démarrage
+        this.LContacts = Contacts.restaurer();
+    }
 
     public void AjoutContacts(String nom, String telephone, String email) {
         Contacts contact = new Contacts(nom, telephone, email);
@@ -21,8 +26,7 @@ public class ContactsManager {
     }
 
     public void AfficherContacts() {
-        List<Contacts> contactsListe = Contacts.restaurer();
-        for (Contacts Contact : contactsListe) {
+        for (Contacts Contact : LContacts) {
             System.out.println(Contact.getNom());
             System.out.println(Contact.getTelephone());
             System.out.println(Contact.getEmail());
@@ -30,23 +34,30 @@ public class ContactsManager {
         }
     }
 
+    // Recherche un contact par son nom
     public void rechercherContact(String nom) {
-        List<Contacts> contactsListe = Contacts.restaurer();
-        for (Contacts Contact : contactsListe) {
+        boolean trouve = false;
+        for (Contacts Contact : LContacts) {
             if (Contact.getNom().equals(nom)) {
+                trouve = true;
                 System.out.println(Contact.getNom());
                 System.out.println(Contact.getTelephone());
                 System.out.println(Contact.getEmail());
             }
+        } // gestion du cas où le contact n'est pas trouvé
+        if (!trouve) {
+            System.out.println("Contact non trouvé");
         }
     }
 
     public void supprimerContact(String nom) {
-        List<Contacts> contactsListe = Contacts.restaurer();
-        for (Contacts Contact : contactsListe) {
-            if (Contact.getNom().equals(nom)) {
-                contactsListe.remove(Contact);
-            }
+        // removeIf retourne true si au moins un élément a été supprimé (donc trouvé)
+        boolean trouve = LContacts.removeIf(contact -> contact.getNom().equals(nom));
+
+        if (!trouve) {
+            System.out.println("Ce contact n'existe pas");
+        } else {
+            System.out.println("Contact supprimé");
         }
     }
 

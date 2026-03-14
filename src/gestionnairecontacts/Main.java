@@ -31,75 +31,89 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         int choix;
-        
+
         do {
             System.out.println("\n--- GESTIONNAIRE DE CONTACTS ---");
             System.out.println("1 - Ajouter un contact");
-        System.out.println("2 - Voir les contacts");
-        System.out.println("3 - Rechercher un contact");
-        System.out.println("4 - Supprimer un contact");
-        System.out.println("5 - Quitter");
-        System.out.println("Votre choix : ");
+            System.out.println("2 - Voir les contacts");
+            System.out.println("3 - Rechercher un contact");
+            System.out.println("4 - Supprimer un contact");
+            System.out.println("5 - Quitter");
+            System.out.println("Votre choix : ");
 
-        choix = sc.nextInt();
+            choix = sc.nextInt();
 
-        switch (choix) {
-            case 1:
-                try {
-                    System.out.println("Entrez le nom : ");
-                    nom = br.readLine();
-                    System.out.println("Entrez le telephone : ");
-                    telephone = br.readLine();
-                    System.out.println("Entrez l'email : ");
-                    email = br.readLine();
-                    cm.AjoutContacts(nom, telephone, email);
-
-                    System.out.println("voullez-vous sauvegarder ce contact ?(oui / non)");
-                    String reponse = br.readLine();
-                    if (reponse.equals("oui")) {
-                        try {
-                            Contacts.sauvegarder(cm.getContacts());
-                            System.out.println("sauvegarde réussi");
-                        } catch (IOException e) {
-                            System.out.println("Erreur lors de la sauvegarde");
+            switch (choix) {
+                case 1:
+                    try {
+                        System.out.println("Entrez le nom : ");
+                        nom = br.readLine();
+                        // interdiction d'enrégistrer un contact avec un nom deja existant
+                        boolean existe = false;
+                        for (Contacts c : cm.getContacts()) {
+                            if (c.getNom().equals(nom)) {
+                                existe = true;
+                                break;
+                            }
                         }
-                    } else {
-                        System.out.println("La sauvegarde n'est pas faite ");
 
+                        if (existe) {
+                            System.out.println("Ce contact existe deja");
+                        } else {
+                            System.out.println("Entrez le telephone : ");
+                            telephone = br.readLine();
+                            System.out.println("Entrez l'email : ");
+                            email = br.readLine();
+
+                            System.out.println("voullez-vous sauvegarder ce contact ?(oui / non)");
+                            String reponse = br.readLine();
+                            if (reponse.equals("oui")) {
+                                try {
+                                    // Ajout du contact à la liste des contacts seulement si l'utilisateur décide de
+                                    // suvegarder
+                                    cm.AjoutContacts(nom, telephone, email);
+                                    Contacts.sauvegarder(cm.getContacts());
+                                    System.out.println("sauvegarde réussi");
+                                } catch (IOException e) {
+                                    System.out.println("Erreur lors de la sauvegarde");
+                                }
+                            } else {
+                                System.out.println("La sauvegarde n'est pas faite ");
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.out.println("revoyer correctement vos entrées");
                     }
+                    break;
+                case 2:
+                    cm.AfficherContacts();
+                    break;
+                case 3:
+                    try {
+                        System.out.println("Entrez le nom : ");
+                        nom = br.readLine();
+                        cm.rechercherContact(nom);
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 4:
+                    try {
+                        System.out.println("Entrez le nom : ");
+                        nom = br.readLine();
+                        cm.supprimerContact(nom);
+                        // sans la sauvegarde le contact est enlevé de la liste mais pas du fichier
+                        Contacts.sauvegarder(cm.getContacts());
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 5:
 
-                } catch (IOException e) {
-                    System.out.println("revoyer correctement vos entrées");
-                }
-                break;
-            case 2:
-                cm.AfficherContacts();
-                break;
-            case 3:
-                try {
-                    System.out.println("Entrez le nom : ");
-                    nom = br.readLine();
-                    cm.rechercherContact(nom);
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 4:
-                try {
-                    System.out.println("Entrez le nom : ");
-                    nom = br.readLine();
-                    cm.supprimerContact(nom);
-                    System.out.println("Suppression réussi !");
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 5:
-
-                System.out.println("Au revoir");
-                break;
-            default:
-                System.out.println("Choix invalide. Veuillez entrer un nombre entre 1 et 5.");
+                    System.out.println("Au revoir");
+                    break;
+                default:
+                    System.out.println("Choix invalide. Veuillez entrer un nombre entre 1 et 5.");
             }
         } while (choix != 5);
     }
